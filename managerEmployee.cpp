@@ -43,6 +43,10 @@ public:
     {
         return code;
     }
+    void setAdded()
+    {
+        is_added = true;
+    }
     bool checkAdded()
     {
         return is_added;
@@ -69,12 +73,30 @@ public:
     manager(string name, string code, int salary, int age) : employee(name, code, salary, age)
     {
         is_manager = true;
-
-        cout << "Calling parent class constructor from derived class\n";
     };
     void addEmployeeToManager(string code)
     {
         supervisedEmployee.push_back(code);
+    }
+    void deleteEmployeeFromManager(string c)
+    {
+        int index = -1;
+        for (int i = 0; i < supervisedEmployee.size(); i++)
+        {
+            if (supervisedEmployee[i] == c)
+            {
+                index = i;
+            }
+        }
+        if (index == -1)
+        {
+            cout << "\nThis employee is not added to the manager\n ";
+        }
+        else
+        {
+            supervisedEmployee.erase(supervisedEmployee.begin() + index);
+            cout << "\n Employee Successfully Deleted from Manager Supervision\n ";
+        }
     }
     void Display(string status)
     {
@@ -83,13 +105,16 @@ public:
             Display(status);
         if (supervisedEmployee.size() > 0)
         {
-            cout << "Here is the employee list who are in supervision of Mr. " + name << endl;
+            cout << "\nHere is the employee list who are in supervision of Mr. " + name << endl;
             for (int i = 0; i < supervisedEmployee.size(); i++)
             {
                 int index = -1;
 
                 index = SearchInEmployeeList(supervisedEmployee[i]);
-                e[index].Display(status);
+                if (index == -1)
+                    cout << "Employee List has been deleted\n";
+                else
+                    e[index].Display(status);
                 cout << "\n";
             }
         }
@@ -154,7 +179,7 @@ void add(int option)
         string coden = code + s;
         employee e1(name, coden, age, salary);
         e.push_back(e1);
-        cout << status + " added successfully " + status + " code is" << coden << endl;
+        cout << status + " added successfully and " + status + " code is -- " << coden << endl;
         // e[ec](name, code, age, salary);
         // employee(name)
     }
@@ -165,7 +190,7 @@ void add(int option)
         string coden = code1 + s;
         manager m1(name, coden, age, salary);
         m.push_back(m1);
-        cout << status + " added successfully " + status + " code is" << coden << endl;
+        cout << status + " added successfully and " + status + " code is -- " << coden << endl;
     }
     // cout<<
 }
@@ -184,14 +209,23 @@ void displayInfo(int option)
     {
 
         index = SearchInEmployeeList(code);
-        e[index].Display(status);
+        if (index == -1)
+            cout << "\n Employee Doesnot Exist in the DataBase \n";
+        else
+        {
+
+            e[index].Display(status);
+        }
     }
     else if (option == 8)
     {
 
         index = SearchInManagerList(code);
+        if (index == -1)
+            cout << "\n Manager Doesnot Exists in the List \n";
         // cout << index << endl;
-        m[index].Display(status);
+        else
+            m[index].Display(status);
     }
 }
 void addEmployee()
@@ -206,25 +240,78 @@ void addEmployee()
     int index2 = -1;
     index2 = SearchInEmployeeList(eCode);
     if (index == -1 && index2 == -1)
-        cout << " No manager and employee found with this codes\n";
+        cout << "\n No manager and employee found with this codes\n";
     else if (index == -1)
-        cout << " No manager found with this code\n";
+        cout << "\n No manager found with this code\n";
     else if (index2 == -1)
-        cout << " No employee found with this code\n";
+        cout << "\n No employee found with this code\n";
     else
     {
         if (e[index2].checkAdded())
         {
-            cout << " You cannot add same employee to different managers\n";
+            cout << "\n You cannot add same employee to different managers\n";
         }
         else
         {
+            e[index2].setAdded();
 
             m[index].addEmployeeToManager(eCode);
-            cout << " Employee Successfully Added\n";
+            cout << "\n Employee Successfully Added\n";
         }
     }
     // if ()
+}
+void deleteEmployeeFromManager()
+{
+    string mCode, eCode;
+    cout << "Enter Manager Code : \n";
+    cin >> mCode;
+
+    int index = SearchInManagerList(mCode);
+    if (index == -1)
+    {
+        cout << " Sorry !!! Manager Does not Exists \n";
+    }
+    else
+    {
+        cout << " Enter Employee Code  : \n";
+        cin >> eCode;
+        m[index].deleteEmployeeFromManager(eCode);
+    }
+}
+
+void deleteEmployee()
+{
+    string mCode, eCode;
+    cout << "Enter Employee Code : \n";
+    cin >> eCode;
+    int index = SearchInEmployeeList(eCode);
+    if (index == -1)
+    {
+        cout << " Sorry !!! Employee Does not Exists \n";
+    }
+    else
+    {
+        e.erase(e.begin() + index);
+        cout << " Employee Deleted Successfully \n";
+    }
+}
+
+void deleteManager()
+{
+    string mCode, eCode;
+    cout << "Enter Manager Code : \n";
+    cin >> mCode;
+    int index = SearchInManagerList(mCode);
+    if (index == -1)
+    {
+        cout << " Sorry !!! Manager Does not Exists \n";
+    }
+    else
+    {
+        m.erase(m.begin() + index);
+        cout << " Manager Deleted Successfully \n";
+    }
 }
 int main()
 {
@@ -234,14 +321,18 @@ int main()
         Menu();
         int option;
         cin >> option;
+        cout << " \n\n";
         if (option > 9)
         {
-            cout << "Don't You have any eyes !!!!\n Please Enter a valid option . \n";
+            cout << "\nDon't You have any eyes !!!!\n Please Enter a valid option . \n";
         }
         else
         {
             if (option == 9)
+            {
+                cout << " Thank You \n Have a nice time .\n\n";
                 return 0;
+            }
             else
             {
                 switch (option)
@@ -254,6 +345,15 @@ int main()
                     break;
                 case 3:
                     addEmployee();
+                    break;
+                case 4:
+                    deleteEmployeeFromManager();
+                    break;
+                case 5:
+                    deleteEmployee();
+                    break;
+                case 6:
+                    deleteManager();
                     break;
                 case 7:
                     displayInfo(7);
